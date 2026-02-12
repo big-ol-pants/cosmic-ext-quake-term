@@ -1,286 +1,115 @@
-# COSMIC Quake Term
+# COSMIC Quake Terminal
 
-COSMIC Quake Term is an experimental quake-style terminal for the COSMIC desktop environment.
+A quake-style dropdown terminal for [COSMIC Desktop](https://github.com/pop-os/cosmic-epoch).
 
-This project is based on [`cosmic-term`](https://github.com/pop-os/cosmic-term) and aims to add quake-like terminal behavior, such as quickly showing and hiding a terminal from the desktop.
+Runs as a background daemon and toggles a terminal emulator's visibility via a keyboard shortcut, similar to Guake, Yakuake, or the Quake console.
 
-> Status: early development
+## How it works
 
-## About
+- Runs as a background daemon with no visible window
+- On first toggle, spawns your configured terminal emulator
+- Subsequent toggles hide (minimize) or show (activate + focus) the terminal
+- Uses COSMIC's Wayland toplevel management protocol (`zcosmic_toplevel_manager_v1`) for window control
+- D-Bus activation handles IPC between the CLI toggle command and the running daemon
 
-COSMIC Quake Term builds on COSMIC Term, the COSMIC terminal emulator. COSMIC Term uses [`alacritty_terminal`](https://docs.rs/alacritty_terminal), provided by the Alacritty project, and uses a custom renderer based on [`cosmic-text`](https://github.com/pop-os/cosmic-text).
+## Installation
 
-The goal of this fork is to keep the COSMIC-native terminal experience while adding quake-style workflow features.
+### Building from source
 
-## Planned Quake-Style Features
+**Dependencies:**
 
-The project is intended to support features such as:
+- Rust toolchain (stable)
+- [just](https://github.com/casey/just) command runner
+- Wayland development libraries
+- A running COSMIC Desktop session
 
-- Toggleable drop-down terminal behavior
-- Keyboard-shortcut-driven show/hide workflow
-- Top-of-screen terminal placement
-- Configurable terminal height
-- Persistent terminal session
-- COSMIC-friendly integration
-- Possible panel/applet integration in the future
-
-Some of these features may still be experimental or incomplete.
-
-## Current Project State
-
-This repository is currently still very close to upstream COSMIC Term. Some package metadata still uses the upstream names:
-
-- Cargo package name: `cosmic-term`
-- App ID: `com.system76.CosmicTerm`
-- Default binary name: `cosmic-term`
-
-These names may change later as the project becomes more distinct from upstream COSMIC Term.
-
-## Requirements
-
-### System
-
-This project is intended for Linux systems running the COSMIC desktop environment.
-
-### Build Tools
-
-You will need:
-
-- Rust
-- Cargo
-- Git
-- Common Linux build tools
-- Development libraries required by COSMIC/libcosmic applications
-
-On Pop!_OS or Ubuntu-based systems, you can start with:
-
-```bash
-sudo apt update
-sudo apt install -y build-essential git pkg-config libxkbcommon-dev
-```
-
-Additional packages may be required depending on your distro and graphics stack.
-
-## Install Rust
-
-If Rust is not already installed, install it with rustup:
-
-```bash
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-```
-
-Then reload your shell environment:
-
-```bash
-source "$HOME/.cargo/env"
-```
-
-Verify the installation:
-
-```bash
-rustc --version
-cargo --version
-```
-
-This project currently declares Rust `1.90` in `Cargo.toml`.
-
-## Clone the Repository
-
-```bash
-git clone https://github.com/big-ol-pants/cosmic-quake-term.git
-cd cosmic-quake-term
-```
-
-## Build
-
-For a debug build:
-
-```bash
-cargo build
-```
-
-For a release build:
-
-```bash
-cargo build --release
-```
-
-You can also use the provided `justfile` if you have [`just`](https://github.com/casey/just) installed:
-
-```bash
-just build-debug
-```
-
-or:
-
-```bash
+```sh
+git clone https://github.com/m0rf30/cosmic-ext-quake-terminal.git
+cd cosmic-ext-quake-terminal
 just build-release
-```
-
-## Run
-
-During development, run with Cargo:
-
-```bash
-cargo run
-```
-
-Or use the `justfile` run recipe:
-
-```bash
-just run
-```
-
-Because the package is currently still named `cosmic-term`, the release binary is expected at:
-
-```bash
-target/release/cosmic-term
-```
-
-Run it directly with:
-
-```bash
-./target/release/cosmic-term
-```
-
-## Install Locally
-
-Build the release binary first:
-
-```bash
-cargo build --release
-```
-
-Then install using the `justfile`:
-
-```bash
 sudo just install
 ```
 
-By default, the `justfile` installs under:
+### Uninstall
 
-```text
-/usr
-```
-
-and uses the current app ID:
-
-```text
-com.system76.CosmicTerm
-```
-
-To install under a different root or prefix, review the variables at the top of the `justfile`.
-
-## Uninstall
-
-If installed through the `justfile`, uninstall with:
-
-```bash
+```sh
 sudo just uninstall
 ```
 
-## Features
+## Configuration
 
-The default Cargo features are:
+Configuration is stored at `~/.config/cosmic/com.github.m0rf30.CosmicExtQuakeTerminal/v1/` using COSMIC's config system.
 
-* `dbus-config`
-* `wgpu`
-* `wayland`
-* `password_manager`
+### Setting the terminal emulator
 
-The `wgpu` feature enables GPU rendering. If GPU rendering is unavailable or disabled, COSMIC Term can fall back to software rendering.
+Write the terminal binary name to the config file:
 
-To build without default features:
+```sh
+# Use ghostty
+mkdir -p ~/.config/cosmic/com.github.m0rf30.CosmicExtQuakeTerminal/v1
+echo '"ghostty"' > ~/.config/cosmic/com.github.m0rf30.CosmicExtQuakeTerminal/v1/terminal_command
 
-```bash
-cargo build --no-default-features
+# Or use cosmic-term (default)
+echo '"cosmic-term"' > ~/.config/cosmic/com.github.m0rf30.CosmicExtQuakeTerminal/v1/terminal_command
 ```
 
-To build with specific features:
+Changes are picked up automatically without restarting the daemon.
 
-```bash
-cargo build --no-default-features --features wayland,wgpu
+### Supported terminals
+
+| Terminal | Notes |
+|----------|-------|
+| `cosmic-term` | Default. Uses `--class` for window identification. |
+| `ghostty` | Spawns with `--gtk-single-instance=false` to avoid joining existing instances. Tracked via its default `com.mitchellh.ghostty` app ID. |
+| `alacritty` | Uses `--class` for window identification. |
+| `kitty` | Uses `--class` for window identification. |
+| `foot` | Uses `--app-id` for window identification. |
+| `wezterm` | Uses `--class` for window identification. |
+| Other | Falls back to `--class`. May work if the terminal supports it. |
+
+### Additional terminal arguments
+
+```sh
+echo '["--some-flag", "value"]' > ~/.config/cosmic/com.github.m0rf30.CosmicExtQuakeTerminal/v1/terminal_args
 ```
 
-## Color Schemes
+## Keyboard shortcut
 
-Custom color schemes can be imported from the application menu:
+### Via COSMIC Settings
 
-```text
-View -> Color schemes...
+Add a custom shortcut in **Settings > Keyboard > Shortcuts > Custom**:
+- Key: `F12` (or your preferred key)
+- Command: `cosmic-ext-quake-terminal toggle`
+
+### Via config file
+
+Add to `~/.config/cosmic/com.system76.CosmicSettings.Shortcuts/v1/custom`:
+
+```ron
+(
+    modifiers: [],
+    key: "F12",
+): Spawn("cosmic-ext-quake-terminal toggle"),
 ```
 
-Templates are available in the [`color-schemes`](color-schemes) directory.
+## Usage
 
-## Development
+The daemon starts automatically via D-Bus activation when you first run the toggle command. You can also start it manually:
 
-Format the code:
+```sh
+# Start the daemon
+cosmic-ext-quake-terminal &
 
-```bash
-cargo fmt
+# Toggle the terminal
+cosmic-ext-quake-terminal toggle
 ```
 
-Run Clippy:
+### Debug logging
 
-```bash
-cargo clippy --all-features -- -W clippy::pedantic
+```sh
+RUST_LOG=cosmic_ext_quake_terminal=debug cosmic-ext-quake-terminal
 ```
-
-Or use the `justfile`:
-
-```bash
-just check
-```
-
-Clean build artifacts:
-
-```bash
-cargo clean
-```
-
-or:
-
-```bash
-just clean
-```
-
-## Notes for Contributors
-
-This project is currently transitioning from upstream COSMIC Term toward a quake-style terminal experience.
-
-Useful areas to work on include:
-
-* Quake-style show/hide behavior
-* Window positioning
-* Shortcut or IPC-based toggle behavior
-* COSMIC panel/applet integration
-* Package/app ID renaming
-* Documentation
-* Testing on COSMIC Wayland sessions
-
-## Known Naming TODOs
-
-The project currently still contains upstream COSMIC Term names in several places. These should eventually be reviewed and renamed if the project is intended to be distributed separately.
-
-Likely places to update:
-
-* `Cargo.toml`
-* `justfile`
-* `.desktop` metadata
-* App ID
-* Icons
-* Metainfo/AppStream files
-* Translation strings
-* README references
 
 ## License
 
-This project is licensed under GPL-3.0-only.
-
-See [`LICENSE`](LICENSE) for details.
-
-## Acknowledgements
-
-This project is based on COSMIC Term by System76 and the COSMIC desktop project.
-
-It uses terminal emulation technology from Alacritty and text rendering technology from COSMIC Text.
+GPL-3.0-only

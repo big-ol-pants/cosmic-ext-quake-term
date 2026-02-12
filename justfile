@@ -1,101 +1,64 @@
-name := 'cosmic-quake-term'
-export APPID := 'io.github.big_ol_pants.CosmicQuakeTerm'
+name := 'cosmic-ext-quake-terminal'
+export APPID := 'com.github.m0rf30.CosmicExtQuakeTerminal'
 
 rootdir := ''
 prefix := '/usr'
 
 base-dir := absolute_path(clean(rootdir / prefix))
 
-export INSTALL_DIR := base-dir / 'share'
-
 cargo-target-dir := env('CARGO_TARGET_DIR', 'target')
 bin-src := cargo-target-dir / 'release' / name
 bin-dst := base-dir / 'bin' / name
 
-desktop := APPID + '.desktop'
-desktop-src := 'target/xdgen' / desktop
-desktop-dst := clean(rootdir / prefix) / 'share' / 'applications' / desktop
-
-metainfo := APPID + '.metainfo.xml'
-metainfo-src := 'target/xdgen' / metainfo
-metainfo-dst := clean(rootdir / prefix) / 'share' / 'metainfo' / metainfo
-
-icons-src := 'res' / 'icons' / 'hicolor'
-icons-dst := clean(rootdir / prefix) / 'share' / 'icons' / 'hicolor'
-
-# Default recipe which runs `just build-release`
+# Default recipe
 default: build-release
 
-# Runs `cargo clean`
+# Remove build artifacts
 clean:
     cargo clean
 
-# Removes vendored dependencies
+# Remove vendored dependencies
 clean-vendor:
     rm -rf .cargo vendor vendor.tar
 
-# `cargo clean` and removes vendored dependencies
+# Full clean
 clean-dist: clean clean-vendor
 
-# Compiles with debug profile
+# Debug build
 build-debug *args:
     cargo build {{args}}
 
-# Compiles with release profile
+# Release build
 build-release *args: (build-debug '--release' args)
 
-# Compiles release profile with vendored dependencies
-build-vendored *args: vendor-extract (build-release '--frozen --offline' args)
-
-# Runs a clippy check
+# Clippy
 check *args:
     cargo clippy --all-features {{args}} -- -W clippy::pedantic
 
-# Runs a clippy check with JSON message format
-check-json: (check '--message-format=json')
-
-dev *args:
-    cargo fmt
-    just run {{args}}
-
-# Run with debug logs
+# Run with debug logging
 run *args:
-    env RUST_LOG=cosmic_term=debug RUST_BACKTRACE=full cargo run --release {{args}}
+    env RUST_LOG=cosmic_ext_quake_terminal=debug RUST_BACKTRACE=full cargo run --release -- {{args}}
 
-# Installs files
+# Install
 install:
     install -Dm0755 {{bin-src}} {{bin-dst}}
-    install -Dm0644 {{desktop-src}} {{desktop-dst}}
-    install -Dm0644 {{metainfo-src}} {{metainfo-dst}}
-    for size in `ls {{icons-src}}`; do \
-        install -Dm0644 "{{icons-src}}/$size/apps/{{APPID}}.svg" "{{icons-dst}}/$size/apps/{{APPID}}.svg"; \
-    done
+    just data/install
 
-# Uninstalls installed files
+# Uninstall
 uninstall:
-    rm {{bin-dst}}
+    rm -f {{bin-dst}}
+    just data/uninstall
 
-# Vendor dependencies locally
+# Vendor dependencies
 vendor:
     #!/usr/bin/env bash
     mkdir -p .cargo
     cargo vendor --sync Cargo.toml | head -n -1 > .cargo/config.toml
     echo 'directory = "vendor"' >> .cargo/config.toml
-    echo >> .cargo/config.toml
-    echo '[env]' >> .cargo/config.toml
-    if [ -n "${SOURCE_DATE_EPOCH}" ]
-    then
-        source_date="$(date -d "@${SOURCE_DATE_EPOCH}" "+%Y-%m-%d")"
-        echo "VERGEN_GIT_COMMIT_DATE = \"${source_date}\"" >> .cargo/config.toml
-    fi
-    if [ -n "${SOURCE_GIT_HASH}" ]
-    then
-        echo "VERGEN_GIT_SHA = \"${SOURCE_GIT_HASH}\"" >> .cargo/config.toml
-    fi
     tar pcf vendor.tar .cargo vendor
     rm -rf .cargo vendor
 
-# Extracts vendored dependencies
+# Extract vendored dependencies
 vendor-extract:
     rm -rf vendor
     tar pxf vendor.tar

@@ -1,11 +1,4 @@
-/.cargo/
-/debian/*debhelper*
-/debian/cosmic-term.substvars
-/debian/cosmic-term/
-/debian/files
-/target/
-/vendor.tar
-/vendor/
-/.direnv/
-/.idea/
-nohup.out
+/target
+.cargo/
+vendor/
+vendor.tar
