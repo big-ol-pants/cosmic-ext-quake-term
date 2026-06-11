@@ -1446,15 +1446,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "cosmic-settings-daemon"
-version = "0.1.0"
-source = "git+https://github.com/pop-os/dbus-settings-bindings#eed01dd3609e90e3c8cd043656734c500956c793"
-dependencies = [
- "zbus",
-]
-
-[[package]]
-name = "cosmic-term"
+name = "cosmic-quake-term"
 version = "1.0.16"
 dependencies = [
  "alacritty_terminal",
@@ -1482,6 +1474,14 @@ dependencies = [
  "tokio",
  "url",
  "xdgen",
+]
+
+[[package]]
+name = "cosmic-settings-daemon"
+version = "0.1.0"
+source = "git+https://github.com/pop-os/dbus-settings-bindings#eed01dd3609e90e3c8cd043656734c500956c793"
+dependencies = [
+ "zbus",
 ]
 
 [[package]]

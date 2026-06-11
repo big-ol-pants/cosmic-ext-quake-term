@@ -1,5 +1,5 @@
-name := 'cosmic-term'
-export APPID := 'com.system76.CosmicTerm'
+name := 'cosmic-quake-term'
+export APPID := 'io.github.big_ol_pants.CosmicQuakeTerm'
 
 rootdir := ''
 prefix := '/usr'

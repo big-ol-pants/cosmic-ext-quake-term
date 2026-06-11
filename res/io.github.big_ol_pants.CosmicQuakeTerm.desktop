@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=COSMIC Terminal
+Comment=Terminal emulator for the COSMIC desktop
+Exec=cosmic-quake-term
+Terminal=false
+Type=Application
+StartupNotify=true
+Icon=io.github.big_ol_pants.CosmicQuakeTerm
+Categories=COSMIC;System;TerminalEmulator;
+Keywords=Command;Shell;Terminal;CLI;

@@ -1,7 +1,7 @@
 [package]
-name = "cosmic-term"
+name = "cosmic-quake-term"
 version = "1.0.16"
-authors = ["Jeremy Soller <jeremy@system76.com>"]
+authors = ["Big_Pants <theo.asberry@gmail.com>"]
 edition = "2024"
 license = "GPL-3.0-only"
 rust-version = "1.90"

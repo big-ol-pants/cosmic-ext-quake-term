@@ -1,9 +1,10 @@
-use std::{env, fs, path::PathBuf};
+use std::{fs, path::PathBuf};
 use xdgen::{App, Context, FluentString};
 
 fn main() {
-    let id = "com.system76.CosmicTerm";
-    let ctx = Context::new("i18n", env::var("CARGO_PKG_NAME").unwrap()).unwrap();
+    let id = "io.github.big_ol_pants.CosmicQuakeTerm";
+    let ctx = Context::new("i18n", "cosmic_term")
+        .expect("failed to load i18n resources for cosmic_term");
     let app = App::new(FluentString("cosmic-terminal"))
         .comment(FluentString("comment"))
         .keywords(FluentString("keywords"));
