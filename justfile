@@ -1,5 +1,5 @@
 name := 'cosmic-ext-quake-terminal'
-export APPID := 'com.github.m0rf30.CosmicExtQuakeTerminal'
+export APPID := 'io.github.big-ol-pants.CosmicExtQuakeTerminal'
 
 rootdir := ''
 prefix := '/usr'
