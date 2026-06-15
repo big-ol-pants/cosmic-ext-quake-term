@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 license = "GPL-3.0-only"
 description = "Quake-style dropdown terminal for COSMIC Desktop"
-repository = "https://github.com/m0rf30/cosmic-ext-quake-terminal"
+repository = "https://github.com/big-ol-pants/cosmic-ext-quake-term/blob/master/Cargo.toml"
 keywords = ["cosmic", "terminal", "quake", "dropdown", "wayland"]
 categories = ["command-line-utilities"]
 
