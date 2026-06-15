@@ -1125,31 +1125,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "cosmic-ext-quake-terminal"
-version = "0.1.0"
-dependencies = [
- "clap",
- "cosmic-client-toolkit",
- "cosmic-config",
- "cosmic-protocols",
- "futures",
- "i18n-embed",
- "i18n-embed-fl",
- "libcosmic",
- "nix 0.29.0",
- "once_cell",
- "rust-embed",
- "serde",
- "smithay-client-toolkit 0.20.0",
- "tokio",
- "tracing",
- "tracing-journald",
- "tracing-subscriber",
- "wayland-client",
- "wayland-protocols",
-]
-
-[[package]]
 name = "cosmic-freedesktop-icons"
 version = "0.4.0"
 source = "git+https://github.com/pop-os/freedesktop-icons#7a61a704f6d1ec41f71cbe766e3cc484858523fa"
@@ -1175,6 +1150,31 @@ dependencies = [
  "wayland-protocols-wlr",
  "wayland-scanner",
  "wayland-server",
+]
+
+[[package]]
+name = "cosmic-quake-terminal"
+version = "0.1.0"
+dependencies = [
+ "clap",
+ "cosmic-client-toolkit",
+ "cosmic-config",
+ "cosmic-protocols",
+ "futures",
+ "i18n-embed",
+ "i18n-embed-fl",
+ "libcosmic",
+ "nix 0.29.0",
+ "once_cell",
+ "rust-embed",
+ "serde",
+ "smithay-client-toolkit 0.20.0",
+ "tokio",
+ "tracing",
+ "tracing-journald",
+ "tracing-subscriber",
+ "wayland-client",
+ "wayland-protocols",
 ]
 
 [[package]]
